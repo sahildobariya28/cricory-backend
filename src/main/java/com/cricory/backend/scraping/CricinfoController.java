@@ -1,5 +1,8 @@
 package com.cricory.backend.scraping;
 
+import com.cricory.backend.snapshot.SnapshotKeys;
+import com.cricory.backend.snapshot.SnapshotStore;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,8 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
-import com.cricory.backend.snapshot.SnapshotKeys;
-import com.cricory.backend.snapshot.SnapshotStore;
 
 @RestController
 @RequestMapping("/api")

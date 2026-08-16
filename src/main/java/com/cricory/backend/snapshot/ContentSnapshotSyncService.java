@@ -1,9 +1,10 @@
 package com.cricory.backend.snapshot;
 
-import com.cricory.backend.catalog.NewsScrapingService;
 import com.cricory.backend.catalog.NewsDataResult;
+import com.cricory.backend.catalog.NewsScrapingService;
 import com.cricory.backend.scraping.CricinfoScrapingService;
 import com.cricory.backend.scraping.MatchDataResult;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

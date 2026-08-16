@@ -1,12 +1,14 @@
 package com.cricory.backend.match;
 
+import static com.cricory.backend.match.MatchApiModels.MatchDetail;
+import static com.cricory.backend.match.MatchApiModels.Scorecard;
+
 import com.cricory.backend.api.ApiResponse;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static com.cricory.backend.match.MatchApiModels.*;
 
 @RestController
 @RequestMapping("/api/matches")

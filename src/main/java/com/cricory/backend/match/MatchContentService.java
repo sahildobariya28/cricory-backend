@@ -1,14 +1,20 @@
 package com.cricory.backend.match;
 
+import static com.cricory.backend.match.MatchApiModels.Batter;
+import static com.cricory.backend.match.MatchApiModels.Bowler;
+import static com.cricory.backend.match.MatchApiModels.Inning;
+import static com.cricory.backend.match.MatchApiModels.MatchDetail;
+import static com.cricory.backend.match.MatchApiModels.Scorecard;
+import static com.cricory.backend.match.MatchApiModels.Team;
+
 import com.cricory.backend.snapshot.SnapshotKeys;
 import com.cricory.backend.snapshot.SnapshotStore;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.cricory.backend.match.MatchApiModels.*;
 
 @Service
 public class MatchContentService {
