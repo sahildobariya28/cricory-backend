@@ -1,11 +1,11 @@
 package com.cricory.backend.snapshot;
 
-import java.time.OffsetDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "api_snapshots")
@@ -43,4 +43,5 @@ public class ApiSnapshotEntity {
     public String getPayload() { return payload; }
     public String getSource() { return source; }
     public OffsetDateTime getFetchedAt() { return fetchedAt; }
+    public OffsetDateTime getUpdatedAt() { return updatedAt; }
 }

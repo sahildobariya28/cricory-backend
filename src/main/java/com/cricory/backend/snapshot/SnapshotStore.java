@@ -2,11 +2,10 @@ package com.cricory.backend.snapshot;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
-
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class SnapshotStore {
@@ -42,6 +41,16 @@ public class SnapshotStore {
     public Map<String, Object> map(String key) {
         Object value = read(key);
         return value instanceof Map<?, ?> map ? (Map<String, Object>) map : Map.of();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> metadata(String key) {
+        return repository.findById(key)
+                .<Map<String, Object>>map(entity -> Map.of(
+                        "source", entity.getSource(),
+                        "fetchedAt", entity.getFetchedAt().toString(),
+                        "updatedAt", entity.getUpdatedAt().toString()))
+                .orElseGet(Map::of);
     }
 
     private Object read(String key) {

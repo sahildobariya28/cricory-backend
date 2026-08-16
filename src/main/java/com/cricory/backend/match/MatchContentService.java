@@ -1,20 +1,14 @@
 package com.cricory.backend.match;
 
-import static com.cricory.backend.match.MatchApiModels.Batter;
-import static com.cricory.backend.match.MatchApiModels.Bowler;
-import static com.cricory.backend.match.MatchApiModels.Inning;
-import static com.cricory.backend.match.MatchApiModels.MatchDetail;
-import static com.cricory.backend.match.MatchApiModels.Scorecard;
-import static com.cricory.backend.match.MatchApiModels.Team;
-
 import com.cricory.backend.snapshot.SnapshotKeys;
 import com.cricory.backend.snapshot.SnapshotStore;
-
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.cricory.backend.match.MatchApiModels.*;
 
 @Service
 public class MatchContentService {
@@ -40,22 +34,40 @@ public class MatchContentService {
 
     public Scorecard scorecard(String id) {
         MatchDetail detail = detail(id);
-        List<Team> teams = detail.teams();
-        Team first = teams.isEmpty() ? new Team("Team 1", "", "") : teams.get(0);
-        Team second = teams.size() < 2 ? new Team("Team 2", "", "") : teams.get(1);
-        String firstScore = first.score().isBlank() ? "Score awaited" : first.score();
-        String secondScore = second.score().isBlank() ? "Score awaited" : second.score();
-        return new Scorecard(id, detail.status(), List.of(
-                previewInning(first.name() + " Innings", firstScore, first.name(), second.name()),
-                previewInning(second.name() + " Innings", secondScore, second.name(), first.name())
-        ));
+        Map<String, Object> stored = snapshotStore.map(SnapshotKeys.scorecard(id));
+        return new Scorecard(id, text(stored, "status").isBlank() ? detail.status() : text(stored, "status"),
+                innings(stored));
     }
 
-    private Inning previewInning(String title, String score, String battingTeam, String bowlingTeam) {
-        return new Inning(title, score,
-                List.of(new Batter(battingTeam + " batting", "-", "-", "-", "-", "-",
-                        "Detailed player data will appear after a successful live sync", true)),
-                List.of(new Bowler(bowlingTeam + " bowling", "-", "-", "-", "-", "-")));
+    @SuppressWarnings("unchecked")
+    private List<Inning> innings(Map<String, Object> scorecard) {
+        if (!(scorecard.get("innings") instanceof List<?> list)) return List.of();
+        return list.stream().filter(Map.class::isInstance).map(raw -> {
+            Map<String, Object> inning = (Map<String, Object>) raw;
+            return new Inning(text(inning, "title"), text(inning, "scoreStr"),
+                    batsmen(inning), bowlers(inning));
+        }).toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Batter> batsmen(Map<String, Object> inning) {
+        if (!(inning.get("batsmen") instanceof List<?> list)) return List.of();
+        return list.stream().filter(Map.class::isInstance).map(raw -> {
+            Map<String, Object> batter = (Map<String, Object>) raw;
+            return new Batter(text(batter, "name"), text(batter, "runs"), text(batter, "balls"),
+                    text(batter, "fours"), text(batter, "sixes"), text(batter, "sr"),
+                    text(batter, "dismissal"), Boolean.parseBoolean(text(batter, "isNotOut")));
+        }).toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Bowler> bowlers(Map<String, Object> inning) {
+        if (!(inning.get("bowlers") instanceof List<?> list)) return List.of();
+        return list.stream().filter(Map.class::isInstance).map(raw -> {
+            Map<String, Object> bowler = (Map<String, Object>) raw;
+            return new Bowler(text(bowler, "name"), text(bowler, "overs"), text(bowler, "maidens"),
+                    text(bowler, "runs"), text(bowler, "wickets"), text(bowler, "eco"));
+        }).toList();
     }
 
     private List<LocatedMatch> allMatches() {

@@ -1,11 +1,11 @@
 package com.cricory.backend.match;
 
-import java.time.OffsetDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "matches")

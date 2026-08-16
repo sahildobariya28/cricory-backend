@@ -24,8 +24,7 @@ public class SecurityConfig {
                                 "/api/recent-matches",
                                 "/api/matches/**",
                                 "/api/news",
-                                "/api/series-list",
-                                "/api/players-list",
+                                 "/api/sync-status",
                                 "/actuator/health",
                                 "/error")
                         .permitAll()

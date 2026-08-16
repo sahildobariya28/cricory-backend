@@ -7,5 +7,6 @@ public final class SnapshotKeys {
     public static final String NEWS = "news";
     public static final String SERIES = "series-list";
     public static final String PLAYERS = "players-list";
+    public static String scorecard(String matchId) { return "scorecard:" + matchId; }
     private SnapshotKeys() { }
 }

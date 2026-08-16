@@ -1,8 +1,5 @@
 package com.cricory.backend.scraping;
 
-import com.cricory.backend.snapshot.SnapshotKeys;
-import com.cricory.backend.snapshot.SnapshotStore;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import com.cricory.backend.snapshot.SnapshotKeys;
+import com.cricory.backend.snapshot.SnapshotStore;
 
 @RestController
 @RequestMapping("/api")
@@ -25,16 +24,20 @@ public class CricinfoController {
 
     @GetMapping("/live-matches")
     public ResponseEntity<Map<String, Object>> liveMatches() {
-        return ResponseEntity.ok(Map.of("data", snapshotStore.list(SnapshotKeys.LIVE)));
+        return ResponseEntity.ok(response(SnapshotKeys.LIVE));
     }
 
     @GetMapping("/upcoming-matches")
-    public ResponseEntity<List<Map<String, Object>>> upcomingMatches() {
-        return ResponseEntity.ok(snapshotStore.list(SnapshotKeys.UPCOMING));
+    public ResponseEntity<Map<String, Object>> upcomingMatches() {
+        return ResponseEntity.ok(response(SnapshotKeys.UPCOMING));
     }
 
     @GetMapping("/recent-matches")
-    public ResponseEntity<List<Map<String, Object>>> recentMatches() {
-        return ResponseEntity.ok(snapshotStore.list(SnapshotKeys.RECENT));
+    public ResponseEntity<Map<String, Object>> recentMatches() {
+        return ResponseEntity.ok(response(SnapshotKeys.RECENT));
+    }
+
+    private Map<String, Object> response(String key) {
+        return Map.of("data", snapshotStore.list(key), "meta", snapshotStore.metadata(key));
     }
 }

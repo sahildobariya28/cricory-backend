@@ -6,9 +6,12 @@ import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.WaitUntilState;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,11 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-
 @Service
 public class NewsScrapingService {
+    private static final Logger log = LoggerFactory.getLogger(NewsScrapingService.class);
     private static final String ORIGIN = "https://www.cricinfo.com";
     private static final String IMAGE_CDN = "https://img1.hscicdn.com";
     private static final String NEWS_URL = ORIGIN + "/cricket-news";
@@ -48,8 +49,9 @@ public class NewsScrapingService {
             current = cache;
             if (current != null && current.expiresAt().isAfter(Instant.now())) return current.result();
             NewsDataResult result = remoteEnabled ? scrapeSafely()
-                    : new NewsDataResult(inspectedFallback(), false, "FALLBACK");
-            cache = new CachedNews(result, Instant.now().plus(Duration.ofMinutes(10)));
+                    : unavailable();
+            Duration ttl = result.remoteSuccess() ? Duration.ofMinutes(10) : Duration.ofMinutes(1);
+            cache = new CachedNews(result, Instant.now().plus(ttl));
             return cache.result();
         }
     }
@@ -58,18 +60,22 @@ public class NewsScrapingService {
         try {
             List<Map<String, Object>> stories = scrape();
             return stories.isEmpty()
-                    ? new NewsDataResult(inspectedFallback(), false, "FALLBACK")
+                    ? unavailable()
                     : new NewsDataResult(List.copyOf(stories), true, "CRICINFO_REMOTE");
-        } catch (RuntimeException ignored) {
-            return new NewsDataResult(inspectedFallback(), false, "FALLBACK");
+        } catch (RuntimeException exception) {
+            log.warn("News scrape failed: {}", exception.getMessage(), exception);
+            return unavailable();
         }
+    }
+
+    private NewsDataResult unavailable() {
+        return new NewsDataResult(List.of(), false, "SCRAPE_UNAVAILABLE");
     }
 
     private List<Map<String, Object>> scrape() {
         String nextData;
         try (Playwright playwright = Playwright.create();
              Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
-                     .setChannel("chrome")
                      .setHeadless(true));
              BrowserContext context = browser.newContext(new Browser.NewContextOptions()
                      .setLocale("en-IN")
@@ -125,31 +131,6 @@ public class NewsScrapingService {
             return IMAGE_CDN + "/image/upload/f_auto,t_ds_w_640" + path;
         }
         return ORIGIN + path;
-    }
-
-    private List<Map<String, Object>> inspectedFallback() {
-        return List.of(
-                fallback("1550025", "Forde's all-round starrer takes Kings past Falcons in rain-reduced thriller",
-                        "Falcons managed just 98 in 19 overs before Kings took control", "2026-08-15T04:54:00.000Z",
-                        "Report", "/lsci/db/PICTURES/CMS/421100/421191.6.jpg"),
-                fallback("1550020", "Padikkal comes in as India opt to bat in Galle; Nuwantha debuts for Sri Lanka",
-                        "Niroshan Dickwella has made a Test comeback while India picked three frontline spinners", "2026-08-15T04:20:00.000Z",
-                        "News", "/lsci/db/PICTURES/CMS/421100/421138.6.jpg"),
-                fallback("1550016", "Hazlewood becomes ninth Australian to take 300 Test wickets",
-                        "Only three Australia bowlers have taken more Test wickets at a better average", "2026-08-15T03:54:00.000Z",
-                        "News", "/lsci/db/PICTURES/CMS/421100/421187.6.jpg"),
-                fallback("1550002", "Hazlewood gets six but not before Bangladesh take 228-run lead",
-                        "Hazlewood picked up all four Bangladesh wickets to fall on the third day", "2026-08-15T02:51:00.000Z",
-                        "Report", "/lsci/db/PICTURES/CMS/421100/421179.6.jpg"),
-                fallback("1549998", "Cricket Australia chief highlights bilateral ODI revenue conundrum",
-                        "CA says bilateral ODIs need more meaning while retaining their financial value", "2026-08-15T01:44:00.000Z",
-                        "News", "/lsci/db/PICTURES/CMS/371700/371713.6.jpg"));
-    }
-
-    private Map<String, Object> fallback(String id, String title, String description,
-                                         String date, String tag, String image) {
-        return Map.of("id", id, "title", title, "description", description, "date", date,
-                "tag", tag, "img", absolute(image), "link", ORIGIN + "/cricket-news");
     }
 
     private record CachedNews(NewsDataResult result, Instant expiresAt) { }

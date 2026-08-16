@@ -1,60 +1,110 @@
 package com.cricory.backend.snapshot;
 
-import com.cricory.backend.catalog.NewsDataResult;
 import com.cricory.backend.catalog.NewsScrapingService;
+import com.cricory.backend.catalog.NewsDataResult;
 import com.cricory.backend.scraping.CricinfoScrapingService;
 import com.cricory.backend.scraping.MatchDataResult;
-
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class ContentSnapshotSyncService {
+    private static final Logger log = LoggerFactory.getLogger(ContentSnapshotSyncService.class);
     private final CricinfoScrapingService matchScraper;
     private final NewsScrapingService newsScraper;
     private final SnapshotStore store;
+    private final SyncStatusService statusService;
 
     public ContentSnapshotSyncService(CricinfoScrapingService matchScraper,
                                       NewsScrapingService newsScraper,
-                                      SnapshotStore store) {
+                                      SnapshotStore store,
+                                      SyncStatusService statusService) {
         this.matchScraper = matchScraper;
         this.newsScraper = newsScraper;
         this.store = store;
+        this.statusService = statusService;
     }
 
     @Scheduled(initialDelayString = "20s", fixedDelayString = "${cricory.sync.live:20s}")
     public void syncLive() {
-        safely(() -> persistMatchResult(SnapshotKeys.LIVE, matchScraper.liveMatchesResult()));
+        syncMatch(SnapshotKeys.LIVE, matchScraper::liveMatchesResult);
     }
 
     @Scheduled(initialDelayString = "30s", fixedDelayString = "${cricory.sync.upcoming:30m}")
     public void syncUpcoming() {
-        safely(() -> persistMatchResult(SnapshotKeys.UPCOMING, matchScraper.upcomingMatchesResult()));
+        syncMatch(SnapshotKeys.UPCOMING, matchScraper::upcomingMatchesResult);
     }
 
     @Scheduled(initialDelayString = "40s", fixedDelayString = "${cricory.sync.recent:15m}")
     public void syncRecent() {
-        safely(() -> persistMatchResult(SnapshotKeys.RECENT, matchScraper.recentMatchesResult()));
+        syncMatch(SnapshotKeys.RECENT, matchScraper::recentMatchesResult);
     }
 
     @Scheduled(initialDelayString = "50s", fixedDelayString = "${cricory.sync.news:10m}")
     public void syncNews() {
-        safely(() -> persistNewsResult(newsScraper.latestNewsResult()));
+        try {
+            NewsDataResult result = newsScraper.latestNewsResult();
+            persistNewsResult(result);
+            if (result.remoteSuccess()) statusService.success(SnapshotKeys.NEWS, result.items().size());
+            else statusService.failure(SnapshotKeys.NEWS, new IllegalStateException(result.source()));
+        } catch (RuntimeException exception) {
+            recordFailure(SnapshotKeys.NEWS, exception);
+        }
     }
 
-    @Scheduled(initialDelayString = "1m", fixedDelayString = "${cricory.sync.catalogs:24h}")
-    public void seedCatalogs() {
-        safely(() -> store.save(SnapshotKeys.SERIES, series(), "CATALOG_SEED"));
-        safely(() -> store.save(SnapshotKeys.PLAYERS, players(), "CATALOG_SEED"));
+    @Scheduled(initialDelayString = "70s", fixedDelayString = "${cricory.sync.live-scorecards:60s}")
+    public void syncLiveScorecards() {
+        snapshotStoreMatches(SnapshotKeys.LIVE).stream().limit(5).forEach(this::syncScorecard);
     }
 
-    private void safely(Runnable task) {
-        try { task.run(); }
-        catch (RuntimeException ignored) {
-            // Never erase the last successful database snapshot on a scrape failure.
+    @Scheduled(initialDelayString = "90s", fixedDelayString = "${cricory.sync.recent-scorecards:30m}")
+    public void syncRecentScorecards() {
+        snapshotStoreMatches(SnapshotKeys.RECENT).stream().limit(10).forEach(this::syncScorecard);
+    }
+
+    private void syncMatch(String key, java.util.function.Supplier<MatchDataResult> loader) {
+        try {
+            MatchDataResult result = loader.get();
+            persistMatchResult(key, result);
+            if (result.remoteSuccess()) statusService.success(key, result.items().size());
+            else statusService.failure(key, new IllegalStateException(result.source()));
+        } catch (RuntimeException exception) {
+            recordFailure(key, exception);
+        }
+    }
+
+    private void recordFailure(String key, RuntimeException exception) {
+        statusService.failure(key, exception);
+        log.warn("{} sync failed; last successful database snapshot was preserved", key, exception);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> snapshotStoreMatches(String key) {
+        List<Map<String, Object>> stored = store.list(key);
+        if (SnapshotKeys.LIVE.equals(key)) return stored;
+        return stored.stream()
+                .flatMap(group -> group.get("matches") instanceof List<?> list ? list.stream() : java.util.stream.Stream.empty())
+                .filter(Map.class::isInstance)
+                .map(item -> (Map<String, Object>) item)
+                .toList();
+    }
+
+    private void syncScorecard(Map<String, Object> match) {
+        String id = String.valueOf(match.getOrDefault("match_id", ""));
+        String link = String.valueOf(match.getOrDefault("detail_link", ""));
+        if (id.isBlank() || link.isBlank() || !link.startsWith("/")) return;
+        String key = SnapshotKeys.scorecard(id);
+        try {
+            Map<String, Object> scorecard = matchScraper.scorecard(id, link);
+            store.save(key, scorecard, "CRICINFO_REMOTE");
+            statusService.success(key, ((List<?>) scorecard.getOrDefault("innings", List.of())).size());
+        } catch (RuntimeException exception) {
+            recordFailure(key, exception);
         }
     }
 
@@ -74,33 +124,4 @@ public class ContentSnapshotSyncService {
         }
     }
 
-    private List<Map<String, Object>> series() {
-        return List.of(
-                series("1543999", "India in Sri Lanka 2026", "2026-08-15", "2026-09-02", 3, 3, 2),
-                series("1527258", "Bangladesh in Australia 2026", "2026-08-10", "2026-08-28", 3, 0, 2),
-                series("1521176", "The Hundred Men's Competition 2026", "2026-07-20", "2026-08-14", 0, 34, 0),
-                series("1544100", "New Zealand in England 2026", "2026-08-16", "2026-09-10", 5, 3, 0));
-    }
-
-    private Map<String, Object> series(String id, String name, String start, String end, int odi, int t20, int test) {
-        return Map.of("id", id, "name", name, "startDate", start, "endDate", end,
-                "odi", odi, "t20", t20, "test", test, "squads", 0, "matches", odi + t20 + test);
-    }
-
-    private List<Map<String, Object>> players() {
-        return List.of(
-                player("p1", "Virat Kohli", "Batter", "India", "Right-hand batter"),
-                player("p2", "Jasprit Bumrah", "Bowler", "India", "Right-arm fast"),
-                player("p3", "Pat Cummins", "Bowler", "Australia", "Right-arm fast"),
-                player("p4", "Travis Head", "Batter", "Australia", "Left-hand batter"),
-                player("p5", "Shakib Al Hasan", "All-rounder", "Bangladesh", "Left-hand batter | Slow left-arm orthodox"),
-                player("p6", "Kane Williamson", "Batter", "New Zealand", "Right-hand batter"),
-                player("p7", "Joe Root", "Batter", "England", "Right-hand batter"),
-                player("p8", "Kagiso Rabada", "Bowler", "South Africa", "Right-arm fast"));
-    }
-
-    private Map<String, Object> player(String id, String name, String role, String country, String skills) {
-        return Map.of("id", id, "name", name, "role", role, "image", "", "country", country,
-                "matchesPlayed", "", "battingAverage", "", "bowlingAverage", "", "skills", skills);
-    }
 }

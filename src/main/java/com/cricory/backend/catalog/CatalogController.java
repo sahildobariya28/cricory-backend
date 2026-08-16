@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -18,20 +17,8 @@ public class CatalogController {
 
     @GetMapping("/news")
     public Map<String, Object> news() {
-        return Map.of("data", snapshotStore.list(com.cricory.backend.snapshot.SnapshotKeys.NEWS));
+        String key = com.cricory.backend.snapshot.SnapshotKeys.NEWS;
+        return Map.of("data", snapshotStore.list(key), "meta", snapshotStore.metadata(key));
     }
 
-    @GetMapping("/series-list")
-    public Map<String, Object> seriesList() {
-        return nested(snapshotStore.list(com.cricory.backend.snapshot.SnapshotKeys.SERIES));
-    }
-
-    @GetMapping("/players-list")
-    public Map<String, Object> playersList() {
-        return nested(snapshotStore.list(com.cricory.backend.snapshot.SnapshotKeys.PLAYERS));
-    }
-
-    private Map<String, Object> nested(List<Map<String, Object>> items) {
-        return Map.of("data", Map.of("data", items));
-    }
 }
