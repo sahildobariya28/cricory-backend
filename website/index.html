@@ -1,0 +1,1004 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cricory - The Ultimate Live Cricket Experience</title>
+    <link rel="icon" type="image/png" href="images/logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100;200;300;400;500;600;700;800;900&family=Geist:wght@100;200;300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:wght@200;300;400;500;600;700;800;900&family=PT+Serif:wght@400;700&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&family=Shantell+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style id="landing-styles">
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --header-height: 80px;
+            --section-spacing: 120px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: var(--font-family-body);
+        }
+
+        .export-wrapper {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family-body);
+            background-color: #fff5f5;
+            color: var(--foreground);
+            overflow-x: hidden;
+        }
+
+        /* Layout Utilities */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 40px;
+            width: 100%;
+        }
+
+        .section {
+            padding: var(--section-spacing) 0;
+        }
+
+        .section-alt {
+            background-color: #f7e9e9;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        .navbar {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #021930;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--muted-foreground);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--foreground);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: #f7e9e9;
+            color: #e43935;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            width: fit-content;
+            gap: 8px;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .hero-description {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--muted-foreground);
+            max-width: 500px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .hero-image {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 52px;
+            padding: 0 32px;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: #e43935;
+            color: var(--primary-foreground);
+            border: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--foreground);
+        }
+
+        .btn-store {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #000;
+            height: 56px;
+            padding: 0 24px;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 40px 0;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--foreground);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 64px;
+        }
+
+        .feature-card {
+            padding: 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: transform 0.2s;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #f7e9e9;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e43935;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .feature-desc {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--muted-foreground);
+        }
+
+        /* Showcase Section */
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .showcase-text h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        .showcase-text p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--muted-foreground);
+            margin-bottom: 32px;
+        }
+
+        .showcase-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .check-icon {
+            color: #e43935;
+            display: flex;
+        }
+
+        .app-screen {
+            width: 100%;
+            border-radius: var(--radius-xl);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 8px solid var(--card);
+        }
+
+        /* CTA Section */
+        .cta-box {
+            background-color: #e43935;
+            color: var(--primary-foreground);
+            border-radius: var(--radius-xl);
+            padding: 80px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-title {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .cta-desc {
+            font-size: 20px;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 80px 0 40px;
+            background-color: #fff5f5;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 64px;
+        }
+
+        .footer-brand h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            color: var(--muted-foreground);
+            max-width: 300px;
+            line-height: 1.5;
+        }
+
+        .footer-col h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-link {
+            color: var(--muted-foreground);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--foreground);
+        }
+
+        .copyright {
+            text-align: center;
+            color: var(--muted-foreground);
+            font-size: 14px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Features Header Styles */
+        .features-header-container {
+            max-width: 700px;
+            margin: 0 auto 64px;
+        }
+
+        .features-header {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .features-subtitle {
+            font-size: 18px;
+            color: var(--muted-foreground);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 32px;
+            }
+
+            .hero-title {
+                font-size: 56px;
+            }
+
+            .hero-image img {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --header-height: 70px;
+                --section-spacing: 80px;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 40px;
+                padding-bottom: 60px;
+                gap: 48px;
+            }
+
+            .hero-content {
+                align-items: center;
+            }
+
+            .hero-title {
+                font-size: 32px;
+                /* Further reduced from 40px */
+                line-height: 1.2;
+            }
+
+            .hero-description {
+                font-size: 16px;
+                /* Further reduced from 18px */
+                margin: 0 auto;
+                max-width: 100%;
+            }
+
+            /* Typography Adjustments for Mobile */
+            .features-header {
+                font-size: 28px;
+                line-height: 1.3;
+            }
+
+            .features-subtitle {
+                font-size: 16px;
+            }
+
+            .feature-title {
+                font-size: 18px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            .hero-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .hero-actions .btn,
+            .cta-box .btn {
+                width: 100%;
+                /* Full width buttons for hero and cta on mobile */
+                max-width: 300px;
+            }
+
+            .navbar .btn {
+                padding: 0 16px;
+                height: 36px;
+                font-size: 13px !important;
+                /* Override inline style if any */
+                white-space: nowrap;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+            }
+
+            .stat-item {
+                margin-bottom: 12px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                margin-top: 40px;
+            }
+
+            .showcase-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .showcase-image {
+                order: -1;
+            }
+
+            .showcase-text h2 {
+                font-size: 28px;
+                line-height: 1.25;
+            }
+
+            .cta-box {
+                padding: 48px 24px;
+            }
+
+            .cta-title {
+                font-size: 32px;
+                display: block;
+                width: 100%;
+            }
+
+            .cta-desc {
+                font-size: 16px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .footer-brand {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-brand h3 {
+                margin: 0 auto 16px;
+            }
+
+            .footer-links {
+                align-items: center;
+            }
+        }
+
+        /* Small Mobile Devices (e.g. iPhone SE, 320px width) */
+        @media (max-width: 375px) {
+            .container {
+                padding: 0 16px;
+                /* Further reduce padding */
+            }
+
+            .navbar .btn {
+                padding: 0 12px;
+                font-size: 12px !important;
+                height: 32px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .hero-description {
+                font-size: 15px;
+            }
+
+            .btn {
+                padding: 0 20px;
+                height: 48px;
+                font-size: 14px;
+            }
+
+            .hero-actions .btn,
+            .cta-box .btn {
+                max-width: 100%;
+            }
+
+            .stat-number {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .features-header {
+                font-size: 24px;
+            }
+
+            .cta-box {
+                padding: 32px 16px;
+            }
+
+            .cta-title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" data-aos="fade-down" data-aos-duration="800">
+        <div class="container" style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+          ">
+            <a href="/" class="logo" style="text-decoration: none;font-style: italic;">
+                <img data-aspect-ratio="9:16" alt="App Screenshot" width="40" src="images/logo.svg" />
+                Cricory
+            </a>
+
+            <a class="btn btn-primary" style="height: 40px; font-size: 14px">
+                Download App
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container">
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge" data-aos="fade-up" data-aos-delay="100">
+                    <div style="
+                  width: 6px;
+                  height: 6px;
+                  background-color: #e43935;
+                  border-radius: 50%;
+                ">
+                    </div>
+                    Cricket App on Android
+                </div>
+                <h1 class="hero-title" data-aos="fade-up" data-aos-delay="200">
+                    Every Run. Every Wicket.
+                    <span style="color: #e43935">Live.</span>
+                </h1>
+                <p class="hero-description" data-aos="fade-up" data-aos-delay="300">
+                    Experience the fastest live cricket scores, in-depth player
+                    statistics, and ball-by-ball commentary. Designed exclusively for
+                    the true cricket fan.
+                </p>
+                <div class="hero-actions" data-aos="fade-up" data-aos-delay="400">
+                    <button class="btn btn-store">
+                        <div style="
+                    width: 24px;
+                    height: 24px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  ">
+                            <iconify-icon icon="lucide:play" style="font-size: 20px; color: #fff"></iconify-icon>
+                        </div>
+                        <div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    line-height: 1.1;
+                    margin-left: 4px;
+                  ">
+                            <span style="font-size: 10px; font-weight: 500; opacity: 0.8">GET IT ON</span>
+                            <span style="font-size: 16px; font-weight: 700">Google Play</span>
+                        </div>
+                    </button>
+                    <a href="#features" class="btn btn-outline">
+                        View Features
+                    </a>
+                </div>
+                <div style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-top: 12px;
+                color: var(--muted-foreground);
+                font-size: 14px;
+              ">
+                    <div style="display: flex">
+                        <iconify-icon icon="lucide:star"
+                            style="font-size: 16px; color: #fbbf24; fill: #fbbf24"></iconify-icon>
+                        <iconify-icon icon="lucide:star"
+                            style="font-size: 16px; color: #fbbf24; fill: #fbbf24"></iconify-icon>
+                        <iconify-icon icon="lucide:star"
+                            style="font-size: 16px; color: #fbbf24; fill: #fbbf24"></iconify-icon>
+                        <iconify-icon icon="lucide:star"
+                            style="font-size: 16px; color: #fbbf24; fill: #fbbf24"></iconify-icon>
+                        <iconify-icon icon="lucide:star"
+                            style="font-size: 16px; color: #fbbf24; fill: #fbbf24"></iconify-icon>
+                    </div>
+                    4.9/5 from 10k+ reviews
+                </div>
+            </div>
+            <div class="hero-image" data-aos="zoom-in" data-aos-delay="500" data-aos-duration="1000">
+                <img data-aspect-ratio="9:16"
+                    data-query="Mobile app interface showing live cricket match score dark mode sleek UI modern colorful sports statistics"
+                    alt="App Screenshot" src="images/mobile.png" />
+            </div>
+        </section>
+    </div>
+
+    <!-- Stats Strip -->
+    <div class="section-alt stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="0">
+                    <span class="stat-number">1M+</span>
+                    <span class="stat-label">Downloads</span>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Leagues Covered</span>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                    <span class="stat-number">0.5s</span>
+                    <span class="stat-label">Update Speed</span>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Live Coverage</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="text-center features-header-container" data-aos="fade-up">
+                <h2 class="features-header">
+                    Everything you need to follow the game
+                </h2>
+                <p class="features-subtitle">
+                    From international test matches to local T20 leagues, we cover
+                    every delivery with precision and speed.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="feature-icon">
+                        <iconify-icon icon="lucide:zap" style="font-size: 24px"></iconify-icon>
+                    </div>
+                    <h3 class="feature-title">Lightning Fast Scores</h3>
+                    <p class="feature-desc">
+                        Get score updates faster than your TV broadcast. Never miss a
+                        boundary, wicket, or milestone again.
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <iconify-icon icon="lucide:bar-chart-2" style="font-size: 24px"></iconify-icon>
+                    </div>
+                    <h3 class="feature-title">Deep Analytics</h3>
+                    <p class="feature-desc">
+                        Detailed player matchups, wagon wheels, and pitch maps. Analyze
+                        the game like a pro.
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <iconify-icon icon="lucide:mic" style="font-size: 24px"></iconify-icon>
+                    </div>
+                    <h3 class="feature-title">Audio Commentary</h3>
+                    <p class="feature-desc">
+                        Listen to expert ball-by-ball commentary in multiple languages
+                        while you're on the go.
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <iconify-icon icon="lucide:newspaper" style="font-size: 24px"></iconify-icon>
+                    </div>
+                    <h3 class="feature-title">Curated News</h3>
+                    <p class="feature-desc">
+                        Breaking news, expert editorials, and exclusive interviews from
+                        the world of cricket.
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <iconify-icon icon="lucide:calendar" style="font-size: 24px"></iconify-icon>
+                    </div>
+                    <h3 class="feature-title">Smart Schedules</h3>
+                    <p class="feature-desc">
+                        Track upcoming matches, set reminders for your favorite teams,
+                        and never miss a toss.
+                    </p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                        <iconify-icon icon="lucide:bell" style="font-size: 24px"></iconify-icon>
+                    </div>
+                    <h3 class="feature-title">Custom Alerts</h3>
+                    <p class="feature-desc">
+                        Personalized notifications for wickets, 50s, 100s, and match
+                        results tailored to you.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Showcase -->
+    <section class="section section-alt">
+        <div class="container">
+            <div class="showcase-grid">
+                <div class="showcase-image" data-aos="fade-right" data-aos-delay="200">
+                    <img class="app-screen" data-aspect-ratio="16:9"
+                        data-query="Cricket app player statistics dashboard detailed graphs dark theme"
+                        alt="Stats Dashboard" src="images/player_analytics.png" />
+                </div>
+                <div class="showcase-text" data-aos="fade-left" data-aos-delay="200">
+                    <h2>Stats that tell the full story</h2>
+                    <p>
+                        Don't just watch the game, understand it. Our comprehensive
+                        statistics engine gives you insights that go beyond the
+                        scorecard.
+                    </p>
+                    <div class="showcase-list">
+                        <div class="check-item">
+                            <div class="check-icon">
+                                <iconify-icon icon="lucide:check-circle-2" style="font-size: 24px"></iconify-icon>
+                            </div>
+                            Player Career Records
+                        </div>
+                        <div class="check-item">
+                            <div class="check-icon">
+                                <iconify-icon icon="lucide:check-circle-2" style="font-size: 24px"></iconify-icon>
+                            </div>
+                            Head-to-Head Comparisons
+                        </div>
+                        <div class="check-item">
+                            <div class="check-icon">
+                                <iconify-icon icon="lucide:check-circle-2" style="font-size: 24px"></iconify-icon>
+                            </div>
+                            Venue History &amp; Pitch Reports
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section" id="download">
+        <div class="container">
+            <div class="cta-box" data-aos="zoom-in" data-aos-duration="800">
+                <h2 class="cta-title">Don’t Miss a Ball</h2>
+                <p class="cta-desc">
+                    Join millions of cricket fans and get the most comprehensive
+                    cricket experience right on your Android device.
+                </p>
+                <button class="btn btn-store" style="background-color: white; color: black; border-color: white">
+                    <div style="
+                  width: 24px;
+                  height: 24px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                ">
+                        <iconify-icon icon="lucide:play" style="font-size: 20px; color: black"></iconify-icon>
+                    </div>
+                    <div style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-start;
+                  line-height: 1.1;
+                  margin-left: 4px;
+                ">
+                        <span style="font-size: 10px; font-weight: 500; opacity: 0.8">GET IT ON</span>
+                        <span style="font-size: 16px; font-weight: 700">Google Play</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" data-aos="fade-up">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Cricory</h3>
+                    <p>
+                        The world's fastest cricket app, built for the fans who live and
+                        breathe the game.
+                    </p>
+
+                </div>
+                <div class="d-flex"></div>
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <div class="footer-links">
+                        <a href="#features" class="footer-link">Features</a>
+                        <a href="#download" class="footer-link">Download</a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <div class="footer-links">
+
+                        <a href="privacy-policy.html" class="footer-link">Privacy Policy</a>
+                        <a href="terms-conditions.html" class="footer-link">Terms & Conditions</a>
+                        <a href="mailto:sahildobariya28@gmail.com" class="footer-link">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">© 2024 Cricory. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        once: true,
+        offset: 50,
+        duration: 800,
+        easing: 'ease-out-cubic',
+    });
+</script>
+<style>
+    :root {
+        --background: #f7fbff;
+        --foreground: #07203a;
+        --border: #00000014;
+        --input: #ffffff;
+        --primary: #0b6e2e;
+        --primary-foreground: #ffffff;
+        --secondary: #e8f7ea;
+        --secondary-foreground: #0b6e2e;
+        --muted: #f1f6f3;
+        --muted-foreground: #6b7b7a;
+        --success: #16a34a;
+        --success-foreground: #ffffff;
+        --accent: #f59e0b;
+        --accent-foreground: #08121a;
+        --destructive: #dc2626;
+        --destructive-foreground: #ffffff;
+        --warning: #f97316;
+        --warning-foreground: #071019;
+        --card: #ffffff;
+        --card-foreground: #07203a;
+        --sidebar: #f3fbf6;
+        --sidebar-foreground: #184b2f;
+        --sidebar-primary: #dff7d9;
+        --sidebar-primary-foreground: #073b20;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --radius-xl: 12px;
+        --font-family-body: Inter;
+    }
+</style>
